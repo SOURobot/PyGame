@@ -15,7 +15,7 @@ banners = []
 poses = []
 level = 1
 curr_move = 1
-sd_pos = (WIDTH/2-75, HEIGHT-240)
+sd_pos = [(WIDTH/2-75, HEIGHT-240), (WIDTH/2-100, HEIGHT-210), (WIDTH/2-45, HEIGHT-240), (WIDTH/2-100, HEIGHT-210)]
 
 for i in range(1, 5):
     poses.append(pygame.image.load(f'assets/poses/sd{i}.png'))
@@ -38,7 +38,7 @@ while run:
     if pressed[pygame.K_LEFT] and str(curr_move) in '34':
         curr_move -= 2
 
-    screen.blit(poses[curr_move - 1], sd_pos)
+    screen.blit(poses[curr_move - 1], sd_pos[curr_move - 1])
 
     pygame.display.update()
 
