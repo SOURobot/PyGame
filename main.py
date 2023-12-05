@@ -64,9 +64,7 @@ while run:
     if passed_delay - last_launch == 1000:
         number, free_vect = sky_conds(copters_in_sky)
         if number < limit:
-            copters_in_sky[free_vect-1].append(0)
-            copters_in_sky[free_vect-1].append(0)
-            copters_in_sky[free_vect-1].append(pygame.time.get_ticks())
+            copters_in_sky[free_vect-1].extend([0, 0, pygame.time.get_ticks()])
 
     new_list = []
     for copter in copters_in_sky:
