@@ -14,6 +14,7 @@ clock = pygame.time.Clock()
 
 level = 1
 speed = 6
+curr_diff = 0
 
 score = 0
 pan_score = 0
@@ -37,8 +38,12 @@ def load_image(name, colorkey=None):
     return image
 
 
-def draw_text(x, coords):
-    text = font.render(str(x), True, (255, 255, 255))
+def draw_text(x, coords, red=False):
+    if red:
+        color = (255, 0, 0)
+    else:
+        color = (255, 255, 255)
+    text = font.render(str(x), True, color)
     screen.blit(text, coords)
 
 
@@ -49,7 +54,7 @@ class Egg(pygame.sprite.Sprite):
         super().__init__(*group)
         self.image = Egg.image
         self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(width)
+        self.rect.x = random.randrange(width-35)
         self.rect.y = 0
 
     def update(self, *args):
@@ -79,9 +84,10 @@ class Pan(pygame.sprite.Sprite):
     def burn(self):
         global score, pan_score, left_fuel
         fire()
-        left_fuel -= 1
-        score += pan_score
-        pan_score = 0
+        left_fuel = max(0, left_fuel - 1)
+        if left_fuel != 0:
+            score += pan_score
+            pan_score = 0
 
     def update(self, *args):
         if args:
@@ -102,7 +108,10 @@ f_l = load_image("fuel.png")
 def draw_info():
     draw_text(score, [53, height - 50])
     draw_text(pan_score, [330, height - 50])
-    draw_text(left_fuel, [330, 710])
+    flag = False
+    if left_fuel <= 5:
+        flag = True
+    draw_text(left_fuel, [330, 710], flag)
     # text = font.render(str(score), True, (255, 255, 255))
     # screen.blit(text, [53, height - 57])
     # text = font.render(str(pan_score), True, (255, 255, 255))
@@ -118,30 +127,44 @@ def draw_info():
     pygame.draw.line(screen, pygame.Color("white"), (5, 700), (width - 5, 700), 2)
 
 
+def egg_fall(passed_time, l_t):
+    if passed_time >= 1500:
+        e = Egg()
+        all_sprites.add(e)
+        eggs.add(e)
+        l_t += passed_time
+    if curr_diff >= 10:
+        global speed
+        speed *= 1.5
+    return l_t
+
+
 all_sprites = pygame.sprite.Group()
 eggs = pygame.sprite.Group()
 pan = Pan()
 all_sprites.add(pan)
 
-for i in range(5):
-    e = Egg()
-    all_sprites.add(e)
-    eggs.add(e)
+# for i in range(5):
+#     e = Egg()
+#     all_sprites.add(e)
+#     eggs.add(e)
 
 
 # main_theme()
+last_tick = 0
 running = True
 while running:
     clock.tick(30)
     all_sprites.update()
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or health == 0 or pan_score > 4:
             running = False
         if event.type == pygame.KEYDOWN:
             pan.update(event)
 
     screen.fill(pygame.Color("black"))
     draw_info()
+    last_tick = egg_fall(pygame.time.get_ticks() - last_tick, last_tick)
     all_sprites.draw(screen)
     pygame.display.flip()
 
