@@ -4,17 +4,21 @@ import sys
 import pygame
 from sounds import *
 
+pygame.init()
 
-size = width, height = 500, 700
+size = width, height = 500, 810
 screen = pygame.display.set_mode(size)
 pygame.display.set_caption('EGG_FALL')
+font = pygame.font.Font("egg_fall/fonts/my_font.ttf", 25)
 clock = pygame.time.Clock()
 
 level = 1
 speed = 6
+
 score = 0
 pan_score = 0
 health = 3
+left_fuel = 20
 
 
 def load_image(name, colorkey=None):
@@ -31,6 +35,11 @@ def load_image(name, colorkey=None):
     else:
         image = image.convert_alpha()
     return image
+
+
+def draw_text(x, coords):
+    text = font.render(str(x), True, (255, 255, 255))
+    screen.blit(text, coords)
 
 
 class Egg(pygame.sprite.Sprite):
@@ -68,8 +77,9 @@ class Pan(pygame.sprite.Sprite):
         self.rect.y = 580
 
     def burn(self):
-        global score, pan_score
+        global score, pan_score, left_fuel
         fire()
+        left_fuel -= 1
         score += pan_score
         pan_score = 0
 
@@ -86,13 +96,26 @@ class Pan(pygame.sprite.Sprite):
 p_s_im = load_image("pan_score.png")
 s_im = load_image("fried_egg.png")
 h_p = load_image("health_point.png")
+f_l = load_image("fuel.png")
 
 
 def draw_info():
-    screen.blit(p_s_im, (0, height - 50))
-    screen.blit(s_im, (0, 0))
+    draw_text(score, [53, height - 50])
+    draw_text(pan_score, [330, height - 50])
+    draw_text(left_fuel, [330, 710])
+    # text = font.render(str(score), True, (255, 255, 255))
+    # screen.blit(text, [53, height - 57])
+    # text = font.render(str(pan_score), True, (255, 255, 255))
+    # screen.blit(text, [330, height - 53])
+    # text = font.render(str(left_fuel), True, (255, 255, 255))
+    # screen.blit(text, [330, 707])
+
+    screen.blit(p_s_im, (280, height - 53))
+    screen.blit(s_im, (3, height - 57))
+    screen.blit(f_l, (280, 707))
     for i in range(health):
-        screen.blit(h_p, (width - 50, i * 50))
+        screen.blit(h_p, (5 + i * 42, 707))
+    pygame.draw.line(screen, pygame.Color("white"), (5, 700), (width - 5, 700), 2)
 
 
 all_sprites = pygame.sprite.Group()
