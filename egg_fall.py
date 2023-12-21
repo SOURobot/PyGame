@@ -61,12 +61,12 @@ class Egg(pygame.sprite.Sprite):
         self.rect = self.rect.move(0, speed)
         if pygame.sprite.collide_mask(self, pan):
             global pan_score
-            catch()
+            # catch()
             self.kill()
             pan_score += 1
         elif self.rect.top > 655:
             global health
-            miss()
+            # miss()
             self.kill()
             health -= 1
 
@@ -83,7 +83,7 @@ class Pan(pygame.sprite.Sprite):
 
     def burn(self):
         global score, pan_score, left_fuel
-        fire()
+        # fire()
         left_fuel = max(0, left_fuel - 1)
         if left_fuel != 0:
             score += pan_score
@@ -107,17 +107,14 @@ f_l = load_image("fuel.png")
 
 def draw_info():
     draw_text(score, [53, height - 50])
-    draw_text(pan_score, [330, height - 50])
+    flag = False
+    if pan_score == 4:
+        flag = True
+    draw_text(pan_score, [330, height - 50], flag)
     flag = False
     if left_fuel <= 5:
         flag = True
     draw_text(left_fuel, [330, 710], flag)
-    # text = font.render(str(score), True, (255, 255, 255))
-    # screen.blit(text, [53, height - 57])
-    # text = font.render(str(pan_score), True, (255, 255, 255))
-    # screen.blit(text, [330, height - 53])
-    # text = font.render(str(left_fuel), True, (255, 255, 255))
-    # screen.blit(text, [330, 707])
 
     screen.blit(p_s_im, (280, height - 53))
     screen.blit(s_im, (3, height - 57))
@@ -150,14 +147,18 @@ all_sprites.add(pan)
 #     eggs.add(e)
 
 
-# main_theme()
+main_theme()
 last_tick = 0
 running = True
 while running:
     clock.tick(30)
     all_sprites.update()
+
+    if health <= 0 or pan_score > 4:
+        running = False
+
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or health == 0 or pan_score > 4:
+        if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             pan.update(event)
