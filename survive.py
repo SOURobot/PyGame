@@ -100,12 +100,6 @@ class Pan(pygame.sprite.Sprite):
                 self.rect.x = min(370, self.rect.x + 40)
 
 
-p_s_im = load_image("pan_score.png")
-s_im = load_image("fried_egg.png")
-h_p = load_image("health_point.png")
-f_l = load_image("fuel.png")
-
-
 def draw_info():
     draw_text(screen, font, score, [53, height - 50])
     flag = False
@@ -137,32 +131,42 @@ def egg_fall(passed_time, l_t):
     return l_t
 
 
+p_s_im = load_image("pan_score.png")
+s_im = load_image("fried_egg.png")
+h_p = load_image("health_point.png")
+f_l = load_image("fuel.png")
+
+
 all_sprites = pygame.sprite.Group()
 eggs = pygame.sprite.Group()
 pan = Pan()
 all_sprites.add(pan)
 
 
-main_theme()
-last_tick = 0
-running = True
-while running:
-    clock.tick(30)
-    all_sprites.update()
+def survive():
+    main_theme()
+    last_tick = 0
+    running = True
+    while running:
+        clock.tick(30)
+        all_sprites.update()
 
-    if health <= 0 or pan_score > 4:
-        running = False
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if health <= 0 or pan_score > 4:
             running = False
-        if event.type == pygame.KEYDOWN:
-            pan.update(event)
 
-    screen.fill(pygame.Color("black"))
-    draw_info()
-    last_tick = egg_fall(pygame.time.get_ticks() - last_tick, last_tick)
-    all_sprites.draw(screen)
-    pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                pan.update(event)
+
+        screen.fill(pygame.Color("black"))
+        draw_info()
+        last_tick = egg_fall(pygame.time.get_ticks() - last_tick, last_tick)
+        all_sprites.draw(screen)
+        pygame.display.flip()
+
+
+survive()
 
 pygame.quit()
