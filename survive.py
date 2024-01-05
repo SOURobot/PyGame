@@ -7,25 +7,32 @@ pygame.init()
 
 size = width, height = 500, 810
 screen = pygame.display.set_mode(size)
-pygame.display.set_caption('EGG_FALL')
-font = pygame.font.Font("egg_fall/fonts/my_font.ttf", 25)
 clock = pygame.time.Clock()
 
-SPEED_FOR_SURVIVE = 8
-SPEED_FOR_TIME = 12
-WAIT_FOR_SURVIVE = 1500
-WAIT_FOR_TIME = 1000
+icon = load_image("game_icon.png")
+surv_mode = load_image("classic.png")
+time_mode = load_image("timer.png")
+
+pygame.display.set_caption('EGG_FALL')
+menu_font = pygame.font.Font("egg_fall/fonts/menu_font.ttf", 85)
+second_menu_font = pygame.font.Font("egg_fall/fonts/second_menu_font.otf", 25)
+font = pygame.font.Font("egg_fall/fonts/my_font.ttf", 25)
+
+# SPEED_FOR_SURVIVE = 8
+# SPEED_FOR_TIME = 12
+WAIT_FOR_SURVIVE = 1800
+WAIT_FOR_TIME = 1200
 
 
-speed = 0
+# speed = 0
 wait = 0
 
 curr_diff = 0
 score = 0
 pan_score = 0
 health = 3
-left_fuel = 20
-timer = 90
+left_fuel = 25
+timer = 104
 
 
 class Egg(pygame.sprite.Sprite):
@@ -37,9 +44,10 @@ class Egg(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(width-35)
         self.rect.y = 0
+        self.speed = random.randint(6, 14)
 
     def update(self, *args):
-        self.rect = self.rect.move(0, speed)
+        self.rect = self.rect.move(0, self.speed)
         if pygame.sprite.collide_mask(self, pan):
             global pan_score
             # catch()
@@ -80,6 +88,16 @@ class Pan(pygame.sprite.Sprite):
                 self.rect.x = min(370, self.rect.x + 40)
 
 
+def draw_menu():
+    screen.blit(icon, (20, 50))
+    screen.blit(menu_font.render("EGG FALL", True, (255, 201, 92)), [125, 50])
+    draw_text(screen, second_menu_font, "by WanderGames", [140, 150])
+    screen.blit(surv_mode, (20, 350))
+    draw_text(screen, second_menu_font, "'A' key for classic game", [100, 370])
+    screen.blit(time_mode, (420, 450))
+    draw_text(screen, second_menu_font, "'D' key for time game", [150, 470])
+
+
 def draw_info(conds):
     draw_text(screen, font, score, [53, height - 50])
     flag = False
@@ -110,9 +128,6 @@ def egg_fall(passed_time, l_t):
         all_sprites.add(e)
         eggs.add(e)
         l_t += passed_time
-    if curr_diff >= 10:
-        global speed
-        speed *= 1.5
     return l_t
 
 
@@ -135,19 +150,19 @@ all_sprites.add(pan)
 
 
 def survive():
-    main_theme()
+    survive_theme()
     last_tick = 0
-    running = True
-    while running:
+    r1 = True
+    while r1:
         clock.tick(30)
         all_sprites.update()
 
         if health <= 0 or pan_score > 4:
-            running = False
+            r1 = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                r1 = False
             if event.type == pygame.KEYDOWN:
                 pan.update(event)
 
@@ -160,21 +175,21 @@ def survive():
 
 def time_event():
     global timer
-    main_theme()
+    time_theme()
     last_tick = 0
     seconds = 0
-    running = True
-    while running:
+    r2 = True
+    while r2:
         clock.tick(30)
         all_sprites.update()
         timer = 90 - seconds
 
         if timer <= 0 or pan_score > 4:
-            running = False
+            r2 = False
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                r2 = False
             if event.type == pygame.KEYDOWN:
                 pan.update(event)
 
@@ -186,17 +201,34 @@ def time_event():
         pygame.display.flip()
 
 
-code = input()
-while code not in '12':
-    print('Неверный ввод!')
-    code = input()
-if code == '1':
-    speed = SPEED_FOR_SURVIVE
-    wait = WAIT_FOR_SURVIVE
-    survive()
-else:
-    speed = SPEED_FOR_TIME
-    wait = WAIT_FOR_TIME
-    time_event()
+# code = input()
+# while code not in '12':
+#     print('Неверный ввод!')
+#     code = input()
+# if code == '1':
+#     wait = WAIT_FOR_SURVIVE
+#     survive()
+# else:
+#     wait = WAIT_FOR_TIME
+#     time_event()
+
+running = True
+main_theme()
+while running:
+    clock.tick(30)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+        if event.type == pygame.KEYDOWN:
+            if event == pygame.K_a:
+                survive()
+            elif event == pygame.K_d:
+                time_event()
+
+    screen.fill(pygame.Color("black"))
+    draw_menu()
+    pygame.display.flip()
+
 
 pygame.quit()
