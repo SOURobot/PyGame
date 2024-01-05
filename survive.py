@@ -3,7 +3,6 @@ import random
 from sounds import *
 from funcs import *
 
-
 pygame.init()
 
 size = width, height = 500, 810
@@ -12,40 +11,21 @@ pygame.display.set_caption('EGG_FALL')
 font = pygame.font.Font("egg_fall/fonts/my_font.ttf", 25)
 clock = pygame.time.Clock()
 
+SPEED_FOR_SURVIVE = 8
+SPEED_FOR_TIME = 12
+WAIT_FOR_SURVIVE = 1500
+WAIT_FOR_TIME = 1000
 
-level = 1
-speed = 6
+
+speed = 0
+wait = 0
+
 curr_diff = 0
-
 score = 0
 pan_score = 0
 health = 3
 left_fuel = 20
-
-
-# def load_image(name, colorkey=None):
-#     fullname = os.path.join('egg_fall', name)
-#     if not os.path.isfile(fullname):
-#         print(f"Файл с изображением '{fullname}' не найден")
-#         sys.exit()
-#     image = pygame.image.load(fullname)
-#     if colorkey is not None:
-#         image = image.convert()
-#         if colorkey == -1:
-#             colorkey = image.get_at((0, 0))
-#         image.set_colorkey(colorkey)
-#     else:
-#         image = image.convert_alpha()
-#     return image
-#
-#
-# def draw_text(screen, font, x, coords, red=False):
-#     if red:
-#         color = (255, 0, 0)
-#     else:
-#         color = (255, 255, 255)
-#     text = font.render(str(x), True, color)
-#     screen.blit(text, coords)
+timer = 90
 
 
 class Egg(pygame.sprite.Sprite):
@@ -92,15 +72,15 @@ class Pan(pygame.sprite.Sprite):
 
     def update(self, *args):
         if args:
-            if event.key == pygame.K_a:
+            if args[0].key == pygame.K_a:
                 self.rect.x = max(0, self.rect.x - 40)
-            if event.key == pygame.K_s:
+            if args[0].key == pygame.K_s:
                 self.burn()
-            if event.key == pygame.K_d:
+            if args[0].key == pygame.K_d:
                 self.rect.x = min(370, self.rect.x + 40)
 
 
-def draw_info():
+def draw_info(conds):
     draw_text(screen, font, score, [53, height - 50])
     flag = False
     if pan_score == 4:
@@ -114,13 +94,18 @@ def draw_info():
     screen.blit(p_s_im, (280, height - 53))
     screen.blit(s_im, (3, height - 57))
     screen.blit(f_l, (280, 707))
-    for i in range(health):
-        screen.blit(h_p, (5 + i * 42, 707))
+    if conds == 1:
+        for i in range(health):
+            screen.blit(h_p, (5 + i * 42, 707))
+    else:
+        screen.blit(t_m, (5, 707))
+        formatted = str(timer // 60) + ':' + str(timer % 60)
+        draw_text(screen, font, formatted, [60, 707])
     pygame.draw.line(screen, pygame.Color("white"), (5, 700), (width - 5, 700), 2)
 
 
 def egg_fall(passed_time, l_t):
-    if passed_time >= 1500:
+    if passed_time >= wait:
         e = Egg()
         all_sprites.add(e)
         eggs.add(e)
@@ -131,10 +116,16 @@ def egg_fall(passed_time, l_t):
     return l_t
 
 
+def update_timer(passed_time):
+    if passed_time >= 1000:
+        return timer
+
+
 p_s_im = load_image("pan_score.png")
 s_im = load_image("fried_egg.png")
 h_p = load_image("health_point.png")
 f_l = load_image("fuel.png")
+t_m = load_image("time.png")
 
 
 all_sprites = pygame.sprite.Group()
@@ -161,12 +152,51 @@ def survive():
                 pan.update(event)
 
         screen.fill(pygame.Color("black"))
-        draw_info()
+        draw_info(1)
         last_tick = egg_fall(pygame.time.get_ticks() - last_tick, last_tick)
         all_sprites.draw(screen)
         pygame.display.flip()
 
 
-survive()
+def time_event():
+    global timer
+    main_theme()
+    last_tick = 0
+    seconds = 0
+    running = True
+    while running:
+        clock.tick(30)
+        all_sprites.update()
+        timer = 90 - seconds
+
+        if timer <= 0 or pan_score > 4:
+            running = False
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.KEYDOWN:
+                pan.update(event)
+
+        screen.fill(pygame.Color("black"))
+        draw_info(2)
+        last_tick = egg_fall(pygame.time.get_ticks() - last_tick, last_tick)
+        seconds = last_tick // 1000
+        all_sprites.draw(screen)
+        pygame.display.flip()
+
+
+code = input()
+while code not in '12':
+    print('Неверный ввод!')
+    code = input()
+if code == '1':
+    speed = SPEED_FOR_SURVIVE
+    wait = WAIT_FOR_SURVIVE
+    survive()
+else:
+    speed = SPEED_FOR_TIME
+    wait = WAIT_FOR_TIME
+    time_event()
 
 pygame.quit()
