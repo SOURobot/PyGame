@@ -18,13 +18,8 @@ menu_font = pygame.font.Font("egg_fall/fonts/menu_font.ttf", 85)
 second_menu_font = pygame.font.Font("egg_fall/fonts/second_menu_font.otf", 25)
 font = pygame.font.Font("egg_fall/fonts/my_font.ttf", 25)
 
-# SPEED_FOR_SURVIVE = 8
-# SPEED_FOR_TIME = 12
 WAIT_FOR_SURVIVE = 1800
 WAIT_FOR_TIME = 1200
-
-
-# speed = 0
 wait = 0
 
 curr_diff = 0
@@ -136,6 +131,21 @@ def update_timer(passed_time):
         return timer
 
 
+def reset():
+    global curr_diff, score, pan_score, health, left_fuel, timer, all_sprites, eggs, pan
+    curr_diff = 0
+    score = 0
+    pan_score = 0
+    health = 3
+    left_fuel = 25
+    timer = 104
+
+    all_sprites = pygame.sprite.Group()
+    eggs = pygame.sprite.Group()
+    pan = Pan()
+    all_sprites.add(pan)
+
+
 p_s_im = load_image("pan_score.png")
 s_im = load_image("fried_egg.png")
 h_p = load_image("health_point.png")
@@ -182,7 +192,7 @@ def time_event():
     while r2:
         clock.tick(30)
         all_sprites.update()
-        timer = 90 - seconds
+        timer = 104 - seconds
 
         if timer <= 0 or pan_score > 4:
             r2 = False
@@ -201,17 +211,6 @@ def time_event():
         pygame.display.flip()
 
 
-# code = input()
-# while code not in '12':
-#     print('Неверный ввод!')
-#     code = input()
-# if code == '1':
-#     wait = WAIT_FOR_SURVIVE
-#     survive()
-# else:
-#     wait = WAIT_FOR_TIME
-#     time_event()
-
 running = True
 main_theme()
 while running:
@@ -221,10 +220,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event == pygame.K_a:
+            if event.key == pygame.K_a:
+                wait = WAIT_FOR_SURVIVE
                 survive()
-            elif event == pygame.K_d:
+                reset()
+                main_theme()
+            elif event.key == pygame.K_d:
+                wait = WAIT_FOR_TIME
                 time_event()
+                reset()
+                main_theme()
 
     screen.fill(pygame.Color("black"))
     draw_menu()
