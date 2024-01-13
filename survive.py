@@ -20,6 +20,7 @@ font = pygame.font.Font("egg_fall/fonts/my_font.ttf", 25)
 
 WAIT_FOR_SURVIVE = 1800
 WAIT_FOR_TIME = 1200
+max_speed = 0
 wait = 0
 
 curr_diff = 0
@@ -39,7 +40,7 @@ class Egg(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(width-35)
         self.rect.y = 0
-        self.speed = random.randint(6, 14)
+        self.speed = random.randint(6, max_speed)
 
     def update(self, *args):
         self.rect = self.rect.move(0, self.speed)
@@ -87,10 +88,16 @@ def draw_menu():
     screen.blit(icon, (20, 50))
     screen.blit(menu_font.render("EGG FALL", True, (255, 201, 92)), [125, 50])
     draw_text(screen, second_menu_font, "by WanderGames", [140, 150])
-    screen.blit(surv_mode, (20, 350))
-    draw_text(screen, second_menu_font, "'A' key for classic game", [100, 370])
-    screen.blit(time_mode, (420, 450))
-    draw_text(screen, second_menu_font, "'D' key for time game", [150, 470])
+
+    screen.blit(surv_mode, (20, 330))
+    draw_text(screen, second_menu_font, "'1' key for CLASSIC game", [100, 350])
+    screen.blit(time_mode, (420, 430))
+    draw_text(screen, second_menu_font, "'2' key for TIME game", [140, 450])
+
+    draw_text(screen, second_menu_font, "CONTROLS:", [170, 590])
+    draw_text(screen, second_menu_font, "'a' to move left", [160, 640])
+    draw_text(screen, second_menu_font, "'d' to move right", [160, 680])
+    draw_text(screen, second_menu_font, "'s' to clear pan", [160, 720])
 
 
 def draw_info(conds):
@@ -98,7 +105,7 @@ def draw_info(conds):
     flag = False
     if pan_score == 4:
         flag = True
-    draw_text(screen, font, pan_score, [330, height - 50], flag)
+    draw_text(screen, font, str(pan_score) + ' / 4', [330, height - 50], flag)
     flag = False
     if left_fuel <= 5:
         flag = True
@@ -220,15 +227,17 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_a:
+            if event.key == pygame.K_1:
                 wait = WAIT_FOR_SURVIVE
+                reset()
+                max_speed = 10
                 survive()
-                reset()
                 main_theme()
-            elif event.key == pygame.K_d:
+            elif event.key == pygame.K_2:
                 wait = WAIT_FOR_TIME
-                time_event()
                 reset()
+                max_speed = 14
+                time_event()
                 main_theme()
 
     screen.fill(pygame.Color("black"))

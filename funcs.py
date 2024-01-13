@@ -4,7 +4,7 @@ import sys
 
 
 def load_image(name, colorkey=None):
-    fullname = os.path.join('egg_fall', name)
+    fullname = os.path.join('egg_fall/images', name)
     if not os.path.isfile(fullname):
         print(f"Файл с изображением '{fullname}' не найден")
         sys.exit()
