@@ -64,10 +64,13 @@ class Pan(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 185
         self.rect.y = 580
+        self.fire = None
 
     def burn(self):
         global score, pan_score, left_fuel
         # fire()
+        self.fire = AnimatedSprite(load_image("flame.png"), 8, 4, self.rect.x + 10, self.rect.y - 100)
+
         left_fuel = max(0, left_fuel - 1)
         if left_fuel != 0:
             score += pan_score
@@ -77,10 +80,41 @@ class Pan(pygame.sprite.Sprite):
         if args:
             if args[0].key == pygame.K_a:
                 self.rect.x = max(0, self.rect.x - 40)
+                if self.fire is not None:
+                    self.fire.rect.x = max(0, self.fire.rect.x - 40)
             if args[0].key == pygame.K_s:
+                if self.fire is not None:
+                    self.fire.kill()
                 self.burn()
             if args[0].key == pygame.K_d:
                 self.rect.x = min(370, self.rect.x + 40)
+                if self.fire is not None:
+                    self.fire.rect.x = min(370, self.fire.rect.x + 40)
+
+
+class AnimatedSprite(pygame.sprite.Sprite):
+    def __init__(self, sheet, columns, rows, x, y):
+        super().__init__(all_sprites)
+        self.frames = []
+        self.cut_sheet(sheet, columns, rows)
+        self.cur_frame = 0
+        self.image = self.frames[self.cur_frame]
+        self.rect = self.rect.move(x, y)
+
+    def cut_sheet(self, sheet, columns, rows):
+        self.rect = pygame.Rect(0, 0, sheet.get_width() // columns,
+                                sheet.get_height() // rows)
+        for j in range(rows):
+            for i in range(columns):
+                frame_location = (self.rect.w * i, self.rect.h * j)
+                self.frames.append(sheet.subsurface(pygame.Rect(
+                    frame_location, self.rect.size)))
+
+    def update(self):
+        self.cur_frame = (self.cur_frame + 1) % len(self.frames)
+        self.image = self.frames[self.cur_frame]
+        if self.cur_frame + 1 == len(self.frames):
+            self.kill()
 
 
 def draw_menu():
