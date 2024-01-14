@@ -35,3 +35,9 @@ def time_theme():
     mixer.init()
     mixer.music.load("egg_fall/sounds/time_theme.mp3")
     mixer.music.play()
+
+
+def res_theme():
+    mixer.init()
+    mixer.music.load("egg_fall/sounds/res_theme.mp3")
+    mixer.music.play()

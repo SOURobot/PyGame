@@ -1,5 +1,7 @@
 import random
 
+import pygame
+
 from sounds import *
 from funcs import *
 
@@ -124,6 +126,13 @@ def draw_info(conds):
     pygame.draw.line(screen, pygame.Color("white"), (5, 700), (width - 5, 700), 2)
 
 
+def draw_res(type, verdict):
+    screen.blit(menu_font.render(verdict, True, (255, 201, 92)), [65, 50])
+    screen.blit(menu_font.render(str(score), True, (255, 201, 92)), [210, 150])
+    draw_text(screen, second_menu_font, type, [150, 250])
+    draw_text(screen, second_menu_font, 'Tap to continue', [150, 450])
+
+
 def egg_fall(passed_time, l_t):
     if passed_time >= wait:
         e = Egg()
@@ -218,6 +227,26 @@ def time_event():
         pygame.display.flip()
 
 
+def results(key):
+    res_theme()
+    r3 = True
+    t, verdict = check_res(key, score)
+
+    while r3:
+        clock.tick(30)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                r3 = False
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                r3 = False
+
+        screen.fill(pygame.Color("black"))
+        draw_res(t, verdict)
+        pygame.display.flip()
+
+
 running = True
 main_theme()
 while running:
@@ -232,12 +261,14 @@ while running:
                 reset()
                 max_speed = 10
                 survive()
+                results(1)
                 main_theme()
             elif event.key == pygame.K_2:
                 wait = WAIT_FOR_TIME
                 reset()
                 max_speed = 14
                 time_event()
+                results(2)
                 main_theme()
 
     screen.fill(pygame.Color("black"))

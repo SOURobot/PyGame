@@ -26,3 +26,28 @@ def draw_text(screen, font, x, coords, red=False):
         color = (255, 255, 255)
     text = font.render(str(x), True, color)
     screen.blit(text, coords)
+
+
+def check_res(key, score):
+    if key == 1:
+        type = "Classic game"
+    else:
+        type = "Time game"
+
+    with open("egg_fall/best.txt", 'r') as f:
+        records = list(map(int, f.read().split()))
+    f.close()
+
+    if records[key - 1] < score:
+        verdict = "New record"
+    else:
+        verdict = "Your score"
+
+    records[key-1] = score
+    records = list(map(str, records))
+
+    with open("egg_fall/best.txt", 'w') as f:
+        f.write(" ".join(records))
+    f.close()
+
+    return type, verdict
