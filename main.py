@@ -129,7 +129,7 @@ def draw_info(conds):
 def draw_res(type, verdict):
     screen.blit(menu_font.render(verdict, True, (255, 201, 92)), [65, 50])
     screen.blit(menu_font.render(str(score), True, (255, 201, 92)), [210, 150])
-    draw_text(screen, second_menu_font, type, [150, 250])
+    draw_text(screen, second_menu_font, type, [170, 250])
     draw_text(screen, second_menu_font, 'Tap to continue', [150, 450])
 
 
